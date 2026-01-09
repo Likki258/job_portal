@@ -4,19 +4,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-app = Flask(__name__, instance_path='/tmp' if os.environ.get('VERCEL') else None)
+app = Flask(__name__)
 
-# Configuration for different environments
-if os.environ.get('VERCEL'):
-    # Vercel production environment
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///job_portal.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-else:
-    # Local development environment
-    app.config['SECRET_KEY'] = 'your-secret-key-here'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///job_portal.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Configuration for production environment
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///job_portal.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
@@ -317,19 +310,10 @@ def init_db():
     with app.app_context():
         db.create_all()
 
-# Initialize database only when app is actually running, not during import
-if not os.environ.get('VERCEL'):
-    init_db()
-
-# Vercel serverless handler
-def handler(environ, start_response):
-    # Initialize database on first request in serverless environment
-    if os.environ.get('VERCEL'):
-        init_db()
-    return app.wsgi_app(environ, start_response)
+# Initialize database
+init_db()
 
 # For local testing
 if __name__ == "__main__":
-    init_db()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
