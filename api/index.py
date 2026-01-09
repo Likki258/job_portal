@@ -6,6 +6,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+# Disable instance folder creation for serverless environment
+app.instance_path = None
+
 # Configuration for different environments
 if os.environ.get('VERCEL'):
     # Vercel production environment
@@ -308,12 +311,20 @@ def delete_user(user_id):
     flash('User deleted successfully!', 'success')
     return redirect(url_for('manage_users'))
 
-# Initialize database
-with app.app_context():
-    db.create_all()
+# Initialize database lazily to avoid filesystem issues during import
+def init_db():
+    with app.app_context():
+        db.create_all()
+
+# Initialize database only when app is actually running, not during import
+if not os.environ.get('VERCEL'):
+    init_db()
 
 # Vercel serverless handler
 def handler(environ, start_response):
+    # Initialize database on first request in serverless environment
+    if os.environ.get('VERCEL'):
+        init_db()
     return app(environ, start_response)
 
 # For local testing
