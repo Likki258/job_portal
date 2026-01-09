@@ -326,7 +326,7 @@ def handler(environ, start_response):
     # Initialize database on first request in serverless environment
     if os.environ.get('VERCEL'):
         init_db()
-    return app(environ, start_response)
+    return app.wsgi_app(environ, start_response)
 
 # For local testing
 if __name__ == "__main__":
