@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Job Portal{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+                <small class="text-muted">Welcome, {{ user.full_name }}!</small>
+            </h2>
+        </div>
+    </div>
+    
+    <!-- Platform Statistics -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <h3>{{ total_users }}</h3>
+                <p>Total Users</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <h3>{{ total_jobs }}</h3>
+                <p>Total Jobs</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <h3>{{ total_applications }}</h3>
+                <p>Total Applications</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <h3>{{ jobs|selectattr('status', 'equalto', 'open')|list|length }}</h3>
+                <p>Open Jobs</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Users Management -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Recent Users</h5>
+                    <a href="{{ url_for('manage_users') }}" class="btn btn-sm btn-outline-primary">Manage All</a>
+                </div>
+                <div class="card-body">
+                    {% if users %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users[:5] %}
+                                        <tr>
+                                            <td>{{ user.username }}</td>
+                                            <td>
+                                                <span class="badge {% if user.role == 'admin' %}bg-danger{% elif user.role == 'employer' %}bg-primary{% else %}bg-success{% endif %}">
+                                                    {{ user.role.title() }}
+                                                </span>
+                                            </td>
+                                            <td>{{ user.created_at.strftime('%b %d, %Y') }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if users|length > 5 %}
+                            <div class="text-center mt-2">
+                                <small class="text-muted">{{ users|length - 5 }} more users</small>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted text-center">No users found</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Jobs -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Recent Job Postings</h5>
+                </div>
+                <div class="card-body">
+                    {% if jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Company</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in jobs[:5] %}
+                                        <tr>
+                                            <td>{{ job.title }}</td>
+                                            <td>{{ job.company_name }}</td>
+                                            <td>
+                                                <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                    {{ job.status.title() }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if jobs|length > 5 %}
+                            <div class="text-center mt-2">
+                                <small class="text-muted">{{ jobs|length - 5 }} more jobs</small>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted text-center">No jobs posted yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('manage_users') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-users me-2"></i>Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('jobs') }}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-briefcase me-2"></i>View All Jobs
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-info w-100" disabled>
+                                <i class="fas fa-chart-bar me-2"></i>View Analytics
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-warning w-100" disabled>
+                                <i class="fas fa-cog me-2"></i>Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Job Portal{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-tachometer-alt me-2"></i>Job Seeker Dashboard
+                <small class="text-muted">Welcome, {{ user.full_name }}!</small>
+            </h2>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <h3>{{ jobs|length }}</h3>
+                <p>Available Jobs</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <h3>{{ applications|length }}</h3>
+                <p>Applications Sent</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <h3>{{ applications|selectattr('status', 'equalto', 'pending')|list|length }}</h3>
+                <p>Pending Applications</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Recent Jobs -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Latest Job Opportunities</h5>
+                </div>
+                <div class="card-body">
+                    {% if jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Company</th>
+                                        <th>Location</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in jobs[:5] %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ job.title }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ job.created_at.strftime('%b %d, %Y') }}</small>
+                                            </td>
+                                            <td>{{ job.company_name }}</td>
+                                            <td>{{ job.location }}</td>
+                                            <td>
+                                                <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn btn-primary btn-sm">
+                                                    View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('jobs') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-search me-2"></i>View All Jobs
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                            <p>No jobs available at the moment.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- My Applications -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-paper-plane me-2"></i>My Applications</h5>
+                </div>
+                <div class="card-body">
+                    {% if applications %}
+                        {% for application in applications[:5] %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <h6 class="mb-1">{{ application.job.title }}</h6>
+                                <p class="mb-1 text-muted">{{ application.job.company_name }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ application.applied_at.strftime('%b %d, %Y') }}</small>
+                                    <span class="application-status status-{{ application.status }}">
+                                        {{ application.status.title() }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if applications|length > 5 %}
+                            <div class="text-center">
+                                <small class="text-muted">{{ applications|length - 5 }} more applications</small>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-paper-plane fa-2x text-muted mb-3"></i>
+                            <p class="mb-0">No applications yet</p>
+                            <small class="text-muted">Start applying for jobs to see them here</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

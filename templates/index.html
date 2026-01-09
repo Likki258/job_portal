@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Job Portal{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">Find Your Dream Job</h1>
+        <p class="lead mb-4">Connect with top employers and discover exciting career opportunities</p>
+        {% if not session.user_id %}
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-md-2">
+                            <i class="fas fa-user-plus me-2"></i>Register Now
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+                <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row text-center mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Search Jobs</h5>
+                    <p class="card-text">Browse through thousands of job listings from top companies.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-building fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">For Employers</h5>
+                    <p class="card-text">Post job openings and find the perfect candidates for your team.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Secure Platform</h5>
+                    <p class="card-text">Your data is safe with our secure authentication system.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">How It Works</h2>
+        </div>
+    </div>
+    
+    <div class="row text-center">
+        <div class="col-md-3 mb-4">
+            <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                <span class="fw-bold">1</span>
+            </div>
+            <h5>Register</h5>
+            <p>Create your account as job seeker or employer</p>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                <span class="fw-bold">2</span>
+            </div>
+            <h5>Complete Profile</h5>
+            <p>Fill in your details and preferences</p>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                <span class="fw-bold">3</span>
+            </div>
+            <h5>Search/Post</h5>
+            <p>Browse jobs or post new openings</p>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                <span class="fw-bold">4</span>
+            </div>
+            <h5>Connect</h5>
+            <p>Apply for jobs or review applications</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

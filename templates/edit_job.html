@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Job - Job Portal{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Job</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="title" class="form-label">Job Title *</label>
+                                <input type="text" class="form-control" id="title" name="title" required 
+                                       value="{{ job.title }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="company_name" class="form-label">Company Name *</label>
+                                <input type="text" class="form-control" id="company_name" name="company_name" required 
+                                       value="{{ job.company_name }}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Job Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="6" required>{{ job.description }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="location" class="form-label">Location *</label>
+                                <input type="text" class="form-control" id="location" name="location" required 
+                                       value="{{ job.location }}">
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="salary_min" class="form-label">Minimum Salary</label>
+                                <input type="number" class="form-control" id="salary_min" name="salary_min" 
+                                       value="{{ job.salary_min or '' }}" step="1000">
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="salary_max" class="form-label">Maximum Salary</label>
+                                <input type="number" class="form-control" id="salary_max" name="salary_max" 
+                                       value="{{ job.salary_max or '' }}" step="1000">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Job Status *</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="open" {% if job.status == 'open' %}selected{% endif %}>Open</option>
+                                <option value="closed" {% if job.status == 'closed' %}selected{% endif %}>Closed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Update Job
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('salary_max').addEventListener('input', function() {
+    const minSalary = parseFloat(document.getElementById('salary_min').value) || 0;
+    const maxSalary = parseFloat(this.value) || 0;
+    
+    if (minSalary > 0 && maxSalary > 0 && minSalary > maxSalary) {
+        this.setCustomValidity('Maximum salary must be greater than minimum salary');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+
+document.getElementById('salary_min').addEventListener('input', function() {
+    const maxSalary = parseFloat(document.getElementById('salary_max').value) || 0;
+    const minSalary = parseFloat(this.value) || 0;
+    
+    if (minSalary > 0 && maxSalary > 0 && minSalary > maxSalary) {
+        document.getElementById('salary_max').setCustomValidity('Maximum salary must be greater than minimum salary');
+    } else {
+        document.getElementById('salary_max').setCustomValidity('');
+    }
+});
+</script>
+{% endblock %}

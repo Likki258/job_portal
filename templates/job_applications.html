@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Job Applications - Job Portal{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{{ job.title }} - Applications</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Applications for {{ job.title }}
+                        <small class="text-white-50">{{ job.company_name }}</small>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <p><strong>Location:</strong> {{ job.location }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Status:</strong> 
+                                <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ job.status.title() }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Total Applications:</strong> {{ applications|length }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Posted:</strong> {{ job.created_at.strftime('%b %d, %Y') }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if applications %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Applicant Name</th>
+                                        <th>Email</th>
+                                        <th>Username</th>
+                                        <th>Application Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in applications %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ application.applicant.full_name }}</strong>
+                                            </td>
+                                            <td>{{ application.applicant.email }}</td>
+                                            <td>{{ application.applicant.username }}</td>
+                                            <td>{{ application.applied_at.strftime('%b %d, %Y') }}</td>
+                                            <td>
+                                                <select class="form-select form-select-sm" onchange="updateApplicationStatus({{ application.id }}, this.value)">
+                                                    <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Pending</option>
+                                                    <option value="accepted" {% if application.status == 'accepted' %}selected{% endif %}>Accepted</option>
+                                                    <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info" onclick="showApplicantDetails({{ application.id }})">
+                                                    <i class="fas fa-eye"></i> View
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h4>No Applications Yet</h4>
+                            <p class="text-muted">Applications will appear here once job seekers start applying for this position.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                        <a href="{{ url_for('edit_job', job_id=job.id) }}" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Edit Job
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Applicant Details Modal -->
+<div class="modal fade" id="applicantModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Applicant Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="applicantDetails">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateApplicationStatus(applicationId, newStatus) {
+    // This would typically make an AJAX call to update the status
+    // For now, we'll just show a success message
+    var statusText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+    console.log('Updating application ' + applicationId + ' to status: ' + statusText);
+    
+    // Show a temporary success message
+    var alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    alert.style.top = '20px';
+    alert.style.right = '20px';
+    alert.style.zIndex = '9999';
+    alert.innerHTML = 'Application status updated to ' + statusText +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+    document.body.appendChild(alert);
+    
+    setTimeout(function() {
+        alert.remove();
+    }, 3000);
+}
+
+function showApplicantDetails(applicationId) {
+    // Find the application data
+    var applications = {{ applications|tojson|safe }};
+    var application = applications.find(function(app) { return app.id === applicationId; });
+    
+    if (application) {
+        var detailsHtml = 
+            '<div class="row">' +
+                '<div class="col-md-6">' +
+                    '<p><strong>Full Name:</strong> ' + application.applicant.full_name + '</p>' +
+                    '<p><strong>Username:</strong> ' + application.applicant.username + '</p>' +
+                    '<p><strong>Email:</strong> ' + application.applicant.email + '</p>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                    '<p><strong>Role:</strong> ' + application.applicant.role + '</p>' +
+                    '<p><strong>Applied Date:</strong> ' + new Date(application.applied_at).toLocaleDateString() + '</p>' +
+                    '<p><strong>Status:</strong> ' +
+                        '<span class="badge bg-' + (application.status === 'pending' ? 'warning' : application.status === 'accepted' ? 'success' : 'danger') + '">' +
+                            application.status.charAt(0).toUpperCase() + application.status.slice(1) +
+                        '</span>' +
+                    '</p>' +
+                '</div>' +
+            '</div>' +
+            '<div class="mt-3">' +
+                '<p><strong>Member Since:</strong> ' + new Date(application.applicant.created_at).toLocaleDateString() + '</p>' +
+            '</div>';
+        
+        document.getElementById('applicantDetails').innerHTML = detailsHtml;
+        new bootstrap.Modal(document.getElementById('applicantModal')).show();
+    }
+}
+</script>
+{% endblock %}

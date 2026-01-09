@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Job Portal{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-tachometer-alt me-2"></i>Employer Dashboard
+                <small class="text-muted">Welcome, {{ user.full_name }}!</small>
+            </h2>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <h3>{{ jobs|length }}</h3>
+                <p>Posted Jobs</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <h3>{{ jobs|selectattr('status', 'equalto', 'open')|list|length }}</h3>
+                <p>Open Positions</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stats-card">
+                <h3>{{ total_applications }}</h3>
+                <p>Total Applications</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4><i class="fas fa-briefcase me-2"></i>My Job Postings</h4>
+                <a href="{{ url_for('post_job') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Post New Job
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            {% if jobs %}
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Company</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Applications</th>
+                                        <th>Posted</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in jobs %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ job.title }}</strong>
+                                            </td>
+                                            <td>{{ job.company_name }}</td>
+                                            <td>{{ job.location }}</td>
+                                            <td>
+                                                <span class="badge {% if job.status == 'open' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                    {{ job.status.title() }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('job_applications', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">
+                                                    {{ job.applications|length }} Applications
+                                                </a>
+                                            </td>
+                                            <td>{{ job.created_at.strftime('%b %d, %Y') }}</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{{ url_for('edit_job', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{{ url_for('job_applications', job_id=job.id) }}" class="btn btn-sm btn-outline-info">
+                                                        <i class="fas fa-users"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ job.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                        <h4>No Jobs Posted Yet</h4>
+                        <p class="text-muted">Start by posting your first job opening to attract talented candidates.</p>
+                        <a href="{{ url_for('post_job') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Post Your First Job
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modals -->
+{% for job in jobs %}
+<div class="modal fade" id="deleteModal{{ job.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the job posting "<strong>{{ job.title }}</strong>"?</p>
+                <p class="text-warning">This action cannot be undone and will also delete all associated applications.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ url_for('delete_job', job_id=job.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete Job</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
