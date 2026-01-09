@@ -87,6 +87,10 @@ def role_required(*allowed_roles):
 def index():
     return render_template('index.html')
 
+@app.route('/health')
+def health():
+    return {'status': 'healthy', 'message': 'Job Portal is running'}
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
