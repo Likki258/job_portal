@@ -6,15 +6,14 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Disable instance folder creation for serverless environment
-app.instance_path = None
-
 # Configuration for different environments
 if os.environ.get('VERCEL'):
     # Vercel production environment
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///job_portal.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # Disable instance folder for serverless
+    app.config['INSTANCE_PATH'] = '/tmp'
 else:
     # Local development environment
     app.config['SECRET_KEY'] = 'your-secret-key-here'
