@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, instance_path='/tmp' if os.environ.get('VERCEL') else None)
 
 # Configuration for different environments
 if os.environ.get('VERCEL'):
@@ -12,8 +12,6 @@ if os.environ.get('VERCEL'):
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///job_portal.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # Disable instance folder for serverless
-    app.config['INSTANCE_PATH'] = '/tmp'
 else:
     # Local development environment
     app.config['SECRET_KEY'] = 'your-secret-key-here'
