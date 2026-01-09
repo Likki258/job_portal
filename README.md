@@ -90,20 +90,37 @@ A comprehensive web-based platform designed to connect job seekers and employers
 
 4. **Run the application**
    ```bash
-   python app.py
+   python index.py
    ```
 
 5. **Access the application**
    Open your web browser and navigate to: `http://127.0.0.1:5000`
 
+## 🌐 Live Deployment
+
+The Job Portal is also deployed live on Vercel:
+- **Live URL:** `https://job-portal-eight-hazel.vercel.app`
+- **Platform:** Vercel Serverless Functions
+- **Status:** Fully functional with all features
+
+### Deployment Features
+- ✅ **Automatic deployment** from GitHub
+- ✅ **Serverless architecture** for scalability
+- ✅ **Global CDN** for fast loading
+- ✅ **SSL certificates** included
+- ✅ **Custom domain** support available
+
 ## Project Structure
 
 ```
 job-portal/
-├── app.py                 # Main Flask application
+├── index.py              # Main Flask application (serverless entry point)
 ├── requirements.txt       # Python dependencies
 ├── README.md             # Project documentation
 ├── job_portal.db         # SQLite database (created automatically)
+├── vercel.json          # Vercel deployment configuration
+├── api/                  # Serverless functions directory
+│   └── index.py         # Alternative serverless entry point
 └── templates/            # HTML templates
     ├── base.html         # Base template with navigation
     ├── index.html        # Home page
